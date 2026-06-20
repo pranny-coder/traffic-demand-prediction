@@ -2,104 +2,206 @@
 
 ## Overview
 
-This project predicts traffic demand using a LightGBM-based machine learning model. The solution includes feature engineering, cross-validation, and traffic demand forecasting using tabular traffic data.
+This project predicts traffic demand using machine learning techniques and advanced feature engineering. The model is built using LightGBM and employs 5-Fold Cross Validation to achieve robust performance.
 
-## Features
+### Results
 
-- Time-based feature engineering
-- Cyclic encoding of temporal features
-- Historical demand aggregation
-- LightGBM regression model
-- K-Fold cross-validation
-- Automated prediction generation
-## Results
+* **OOF R² Score:** 0.959374
+* **Competition Score:** 95.9374
+* **Model:** LightGBM Regressor
+* **Validation Strategy:** 5-Fold Cross Validation
 
-The model was evaluated using 5-Fold Cross Validation.
+---
 
-### Cross-Validation Performance
+## Dataset
 
-| Fold | R² Score |
-|------|----------|
-| 1 | 0.9598 |
-| 2 | 0.9598 |
-| 3 | 0.9608 |
-| 4 | 0.9557 |
-| 5 | 0.9606 |
+The dataset consists of traffic-related information such as:
 
-**Overall Out-of-Fold R² Score:** **0.9594**
+* Geographical location (Geohash)
+* Road Type
+* Number of Lanes
+* Presence of Large Vehicles
+* Nearby Landmarks
+* Weather Conditions
+* Temperature
+* Timestamp
 
-This indicates that the model explains approximately **95.94% of the variance** in traffic demand, demonstrating strong predictive performance.
+Target Variable:
 
-### Most Important Features
+* `demand` — Traffic demand to be predicted.
 
-| Feature | Importance |
-|----------|------------|
-| Temperature | 64666.0 |
-| Time of Day | 41939.8 |
-| Geohash | 41809.6 |
-| Geohash Mean Demand | 31826.2 |
-| Hour | 16545.8 |
-| Hour Sin | 15781.8 |
-| Hour Cos | 14449.8 |
-| Number of Lanes | 10112.8 |
-| Minute | 9381.2 |
-| Weather Mean Demand | 6579.4 |
+---
 
-### Key Insights
+## Features Engineered
 
-- Achieved **95.94% R² Score** using LightGBM.
-- Temperature emerged as the most influential predictor.
-- Spatial features (Geohash) significantly improved forecasting accuracy.
-- Temporal features such as hour, time of day, and cyclic encodings captured traffic patterns effectively.
-- Historical demand aggregation features further enhanced predictive performance.
-## Technologies Used
+### Time Features
 
-- Python
-- Pandas
-- NumPy
-- LightGBM
-- Scikit-Learn
+* Hour
+* Minute
+* Time of Day (minutes since midnight)
 
-## Project Structure
+### Cyclical Time Features
 
-```text
-.
-├── solve.py
-└── README.md
+* Hour Sin
+* Hour Cos
+* Minute Sin
+* Minute Cos
+
+### Target Encodings
+
+Historical demand statistics computed from training data:
+
+* Mean Demand by Geohash
+* Mean Demand by Road Type
+* Mean Demand by Weather
+
+### Categorical Encoding
+
+Label Encoding applied to:
+
+* Geohash
+* RoadType
+* LargeVehicles
+* Landmarks
+* Weather
+
+---
+
+## Model Architecture
+
+### LightGBM Parameters
+
+```python
+{
+    "objective": "regression",
+    "metric": "rmse",
+    "boosting_type": "gbdt",
+    "learning_rate": 0.03,
+    "num_leaves": 63,
+    "max_depth": 8,
+    "feature_fraction": 0.8,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 1,
+    "random_state": 42
+}
 ```
 
-## Running the Project
+### Training Strategy
+
+* 5-Fold Cross Validation
+* Early Stopping: 150 rounds
+* Maximum Trees: 5000
+* Feature Importance Averaging
+
+---
+
+## Top Important Features
+
+| Feature             | Importance |
+| ------------------- | ---------- |
+| Temperature         | 64666      |
+| Time of Day         | 41939      |
+| Geohash             | 41809      |
+| Geohash Mean Demand | 31826      |
+| Hour                | 16545      |
+| Hour Sin            | 15781      |
+| Hour Cos            | 14449      |
+| Number of Lanes     | 10112      |
+| Minute              | 9381       |
+| Weather Mean Demand | 6579       |
+
+---
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/traffic-demand-prediction.git
+cd traffic-demand-prediction
+```
 
 Install dependencies:
 
 ```bash
-pip install pandas numpy lightgbm scikit-learn
+pip install pandas numpy scikit-learn lightgbm
 ```
 
-Run the model:
+For Apple Silicon (M1/M2/M3):
 
 ```bash
-python solve.py
+brew install libomp
+pip install lightgbm
 ```
 
-## Model Highlights
+---
 
-- Feature engineering for temporal and geographic information
-- Cross-validation for robust evaluation
-- Demand forecasting using gradient boosting
-- Optimized for tabular traffic datasets
+## Project Structure
+
+```text
+traffic-demand-prediction/
+│
+├── train.csv
+├── test.csv
+├── sample_submission.csv
+├── solve.py
+├── submission_optimized.csv
+├── README.md
+└── catboost_info/
+```
+
+---
+
+## Running the Project
+
+```bash
+python3 solve.py
+```
+
+The script will:
+
+1. Load datasets
+2. Perform feature engineering
+3. Train LightGBM using 5-Fold CV
+4. Generate predictions
+5. Create submission file
+
+Output:
+
+```text
+submission_optimized.csv
+```
+
+---
 
 ## Future Improvements
 
-- Hyperparameter optimization
-- Ensemble models (XGBoost + CatBoost)
-- Real-time traffic prediction
-- Interactive dashboard for visualization
+* Out-of-Fold Target Encoding
+* CatBoost Ensemble
+* XGBoost + LightGBM Blending
+* Geohash-Hour Interaction Features
+* RoadType-Hour Demand Statistics
+* Hyperparameter Optimization using Optuna
+
+---
+
+## Tech Stack
+
+* Python
+* Pandas
+* NumPy
+* Scikit-Learn
+* LightGBM
+
+---
 
 ## Author
 
-**Pranav UmeshBhai Thobhani**  
-B.E. Computer Science  
-BITS Pilani, Hyderabad Campus
+Pranav Thobhani
 
-GitHub: https://github.com/pranny-coder
+B.E. Computer Science, BITS Pilani Hyderabad Campus
+
+Interested in Machine Learning, Data Science, Quantitative Finance, and Algorithmic Problem Solving.
+
+
+
